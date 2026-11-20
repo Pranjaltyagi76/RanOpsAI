@@ -6,7 +6,7 @@ from app.main import create_app
 
 
 def test_settings_work_without_optional_keys() -> None:
-    settings = Settings(_env_file=None)
+    settings = Settings()
 
     assert settings.ai_provider == "demo"
     assert settings.demo_mode is True
@@ -16,14 +16,14 @@ def test_settings_work_without_optional_keys() -> None:
 
 
 def test_secrets_are_hidden_from_settings_repr() -> None:
-    settings = Settings(_env_file=None, gemini_api_key="super-secret", admin_token="tok")
+    settings = Settings(gemini_api_key="super-secret", admin_token="tok")
 
     assert "super-secret" not in repr(settings)
     assert "tok" not in repr(settings)
 
 
 def test_cors_origins_are_parsed_from_comma_separated_string() -> None:
-    settings = Settings(_env_file=None, cors_origins="https://a.example, https://b.example ,")
+    settings = Settings(cors_origins="https://a.example, https://b.example ,")
 
     assert settings.cors_origin_list == ["https://a.example", "https://b.example"]
 
@@ -70,6 +70,6 @@ def test_cors_allows_configured_origin_and_preview_regex() -> None:
 
 
 def test_docs_disabled_in_production() -> None:
-    client = TestClient(create_app(Settings(_env_file=None, app_env="production")))
+    client = TestClient(create_app(Settings(app_env="production")))
 
     assert client.get("/docs").status_code == 404

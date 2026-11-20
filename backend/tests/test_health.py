@@ -1,12 +1,12 @@
-import os
-
 import pytest
 from fastapi.testclient import TestClient
 
 from app.api import health as health_module
-from app.core.config import Settings, get_settings
+from app.core.config import get_settings
 from app.core.versions import APP_VERSION
 from app.db import session as db_session
+from app.main import create_app
+from tests.conftest import REAL_DATABASE_URL
 
 
 def _fail_if_database_touched(*_args, **_kwargs):
@@ -67,14 +67,13 @@ def test_ready_ok_when_database_check_passes(client: TestClient, monkeypatch) ->
     assert response.json() == {"status": "ok", "database": "ok"}
 
 
-@pytest.mark.skipif(not os.getenv("DATABASE_URL"), reason="needs a real PostgreSQL (CI)")
-def test_ready_against_real_database() -> None:
-    from app.main import create_app
-
-    settings = Settings(app_env="test")
-    app = create_app(settings)
-    app.dependency_overrides[get_settings] = lambda: settings
+@pytest.mark.skipif(not REAL_DATABASE_URL, reason="needs a real PostgreSQL (CI)")
+def test_ready_against_real_database(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DATABASE_URL", REAL_DATABASE_URL or "")
+    get_settings.cache_clear()
+    app = create_app(get_settings())
 
     response = TestClient(app).get("/health/ready")
 
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
+    assert response.json() == {"status": "ok", "database": "ok"}
