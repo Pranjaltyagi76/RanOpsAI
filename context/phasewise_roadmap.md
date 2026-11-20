@@ -13,7 +13,7 @@
 | Phase | Name | Status | Started | Completed | Notes |
 |---|---|---|---|---|---|
 | — | Planning docs (spec, requirements, context) | ✅ Done | 2026-11-20 | 2026-11-20 | |
-| 0 | Foundation + skeleton deployment | ⏳ Not started | | | |
+| 0 | Foundation + skeleton deployment | 🔄 In progress | 2026-11-20 | | Code, tests, CI done locally; Neon/Render/Vercel accounts + deploy pending (owner action) |
 | 1 | Data model + topology | ⏳ | | | |
 | 2 | Telemetry simulator | ⏳ | | | |
 | 3 | Fault injection (slice: 3 scenarios) | ⏳ | | | |

@@ -93,6 +93,8 @@ SELECT pg_size_pretty(sum(pg_column_size(t.*))::bigint) FROM telemetry_series t 
 
 | Date | Phase | Commit | Environment | Budget ID | Result | Pass? | Notes |
 |---|---|---|---|---|---|---|---|
-| — | — | — | — | — | TBD | — | No measurements yet (pre-Phase 0) |
+| 2026-11-20 | 0 | 12d3ca0 | local-windows (no Docker) | PB-01 | 78 MB working set, idle uvicorn | ✅ | Indicative only; re-measure in Docker 512m / on Render |
+| 2026-11-20 | 0 | 12d3ca0 | local-windows | PB-03 | `import app.main` ≈ 1.2–1.3 s | ✅ | Import time only, not full process start |
+| 2026-11-20 | 0 | 12d3ca0 | local build | PB-15 | 112 KB gzip main chunk (+ small route chunks) | ✅ | `npm run build` output |
 
 Environment values: `local-docker-512m-0.1cpu`, `render-free`, `vercel`, `neon-free`.
