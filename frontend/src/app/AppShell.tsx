@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { BackendStatusBanner } from './BackendStatusBanner'
 import { NAV_ITEMS } from './navigation'
 
 function Logo() {
@@ -69,6 +70,7 @@ export function AppShell() {
           <div className="md:hidden">
             <NavItems orientation="horizontal" />
           </div>
+          <BackendStatusBanner />
         </header>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-8">
