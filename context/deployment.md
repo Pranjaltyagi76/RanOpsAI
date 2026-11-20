@@ -138,54 +138,18 @@ Generate `ADMIN_TOKEN` locally, e.g. `python -c "import secrets; print(secrets.t
 
 ## 4. GitHub Actions workflows
 
-Pin action versions to their current major release at implementation time.
+Action versions in use: `actions/checkout@v5`, `actions/setup-python@v6`, `actions/setup-node@v5`. Bump majors deliberately, one PR at a time.
 
-### 4.1 `ci.yml`
+### 4.1 `ci.yml` (implemented — see [`.github/workflows/ci.yml`](../.github/workflows/ci.yml))
 
-```yaml
-name: CI
-on:
-  push:
-    branches: [main]
-  pull_request:
+Runs on every push to `main` and every pull request; cancels superseded runs.
 
-jobs:
-  backend:
-    runs-on: ubuntu-latest
-    defaults: { run: { working-directory: backend } }
-    services:
-      postgres:
-        image: postgres:16
-        env: { POSTGRES_USER: ranops, POSTGRES_PASSWORD: ranops, POSTGRES_DB: ranops_test }
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U ranops" --health-interval 5s
-          --health-timeout 5s --health-retries 10
-    env:
-      APP_ENV: test
-      DATABASE_URL: postgresql+psycopg://ranops:ranops@localhost:5432/ranops_test
-      DIRECT_DATABASE_URL: postgresql+psycopg://ranops:ranops@localhost:5432/ranops_test
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.12", cache: pip, cache-dependency-path: "backend/requirements*.txt" }
-      - run: pip install -r requirements.txt -r requirements-dev.txt
-      - run: ruff check . && ruff format --check .
-      - run: alembic upgrade head
-      - run: pytest -q
+| Job | Steps |
+|---|---|
+| Backend | Python from `backend/.python-version` → `pip install` → `ruff check` + `ruff format --check` → Alembic `upgrade head`, `downgrade base`, `upgrade head` against a `postgres:16` service → `pytest -q` (with `DATABASE_URL` set, so the real readiness test runs) |
+| Frontend | Node from `frontend/.nvmrc` → `npm ci` → `npm run lint` (oxlint) → `npm run typecheck` → `npm run build` |
 
-  frontend:
-    runs-on: ubuntu-latest
-    defaults: { run: { working-directory: frontend } }
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm, cache-dependency-path: frontend/package-lock.json }
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run build
-```
+Tests isolate themselves from CI environment variables (`tests/conftest.py`), so `DATABASE_URL` only reaches the tests that ask for it.
 
 ### 4.2 `cleanup.yml`
 

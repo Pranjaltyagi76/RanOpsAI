@@ -43,7 +43,7 @@ RANOps AI simulates a small 5G / Open RAN network, breaks it on purpose, and che
 
 | Phase | Scope | Status |
 |---|---|---|
-| 0 | Foundation + skeleton deployment | ⏳ Not started |
+| 0 | Foundation + skeleton deployment | 🔄 In progress — code and CI done, cloud deploy pending |
 | 1 | Data model + topology | ⏳ |
 | 2 | Telemetry simulator | ⏳ |
 | 3 | Fault injection (first 3 scenarios) | ⏳ |
@@ -102,7 +102,37 @@ Details: [`context/architecture.md`](context/architecture.md) and [`context/syst
 
 ## Getting started
 
-Local setup instructions land with Phase 0. Prerequisites: Git, Python 3.12, Node.js 22 LTS+, and optionally Docker Desktop — see [`requirement.md` §5](requirement.md#5-development-toolchain).
+Prerequisites: Git, Python 3.12, Node.js 24 LTS (22+ works), and optionally Docker Desktop — see [`requirement.md` §5](requirement.md#5-development-toolchain). No database is needed to start: `/health` and the whole UI shell work without one.
+
+**Backend** (http://localhost:8000)
+
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt -r requirements-dev.txt
+.venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
+```
+
+Optional: copy `.env.example` to `backend/.env` and set `DATABASE_URL` / `DIRECT_DATABASE_URL` (a Neon `dev` branch works), then run `.venv\Scripts\alembic upgrade head`.
+
+**Frontend** (http://localhost:5173)
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend calls `http://localhost:8000` by default; override with `VITE_API_BASE_URL` in `frontend/.env.local`.
+
+**Checks** (the same ones CI runs)
+
+```powershell
+cd backend;  .venv\Scripts\ruff check .;  .venv\Scripts\ruff format --check .;  .venv\Scripts\python -m pytest -q
+cd frontend; npm run lint; npm run typecheck; npm run build
+```
+
+Deployment: [`context/deployment.md`](context/deployment.md).
 
 ## Documentation
 

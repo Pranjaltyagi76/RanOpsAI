@@ -188,7 +188,7 @@ Targets marked *(target)* are validated and recorded in [`context/performance_re
 |---|---|---|
 | Git | 2.4x+ | Version control |
 | Python | 3.12 (pinned in `backend/.python-version`) | Backend |
-| Node.js | 22 LTS or newer, with npm | Frontend tooling |
+| Node.js | 24 LTS (pinned in `frontend/.nvmrc`; 22+ works), with npm | Frontend tooling |
 | Docker Desktop | current | Local Postgres, memory/CPU-limited backend tests (optional but recommended) |
 | PostgreSQL | 16+ | Local via Docker, or a Neon `dev` branch (free plan allows branches) |
 
@@ -200,7 +200,7 @@ Optional providers: `google-genai` (Gemini), `groq`.
 
 ### Planned frontend dependencies
 
-`react`, `react-dom`, `react-router`, `@tanstack/react-query`, `recharts`, `@xyflow/react` (React Flow), `tailwindcss`, shadcn/ui components, `typescript`, `vite`, `eslint`.
+`react`, `react-dom`, `react-router`, `@tanstack/react-query`, `recharts`, `@xyflow/react` (React Flow), `tailwindcss`, shadcn/ui components (Radix primitives), `lucide-react`, `typescript` 7, `vite` 8, `oxlint`.
 
 Exact versions are pinned in `backend/requirements.txt` and `frontend/package-lock.json` during Phase 0.
 
